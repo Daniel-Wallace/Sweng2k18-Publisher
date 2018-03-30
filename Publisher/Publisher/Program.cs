@@ -22,7 +22,7 @@ namespace Publisher
                 counter += 1;
                 clientSocket = serverSocket.AcceptTcpClient();
                 Console.WriteLine(" >> " + "Client No:" + Convert.ToString(counter) + " started!");
-                handleClinet client = new handleClinet();
+                handleClient client = new handleClient();
                 client.startClient(clientSocket, Convert.ToString(counter));
             }
 
@@ -34,7 +34,7 @@ namespace Publisher
     }
 
     //Class to handle each client request separatly
-    public class handleClinet
+    public class handleClient
     {
         TcpClient clientSocket;
         string clNo;
@@ -67,7 +67,7 @@ namespace Publisher
                     Console.WriteLine(" >> " + "From client-" + clNo + dataFromClient);
 
                     rCount = Convert.ToString(requestCount);
-                    serverResponse = "Server to clinet(" + clNo + ") " + rCount;
+                    serverResponse = "Server to client(" + clNo + ") " + rCount;
                     sendBytes = Encoding.ASCII.GetBytes(serverResponse);
                     networkStream.Write(sendBytes, 0, sendBytes.Length);
                     networkStream.Flush();
