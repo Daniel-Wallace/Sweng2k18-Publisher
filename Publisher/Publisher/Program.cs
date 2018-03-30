@@ -1,4 +1,8 @@
-﻿using System;
+﻿/*
+ * Program.cs (Server Socket) by
+ * http://csharp.net-informations.com/communications/csharp-multi-threaded-server-socket.htm
+ */
+using System;
 using System.Threading;
 using System.Net.Sockets;
 using System.Text;
