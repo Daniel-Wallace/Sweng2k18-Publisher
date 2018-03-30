@@ -48,10 +48,13 @@ namespace Publisher
 		// This is going to be done in the thread.
 		private void doChat()
 		{
+			CSVReader reader = new CSVReader();
 			
+			String bFilePath = "";
 			String[,] beamData;		
 			int beamLine = 0;       // Current line in beamData
 
+			String tFilePath = "";
 			String[,] targetData;
 			int targetLine = 0;		// Current line in targetData
 
@@ -61,15 +64,22 @@ namespace Publisher
 				{
 					NetworkStream networkStream = clientSocket.GetStream();
 					
-					
-					// Send row of Target
-					send_To_Sub(networkStream, "Suhhhh???");
-					// Wait for response that client got target data. then you know you can send target data again
-					recieve_From_Sub(networkStream);
-					// Send row of Beam    
-					send_To_Sub(networkStream, "foobar");
-					// Wait for response that client got beam data. then you know you can send beam data again
-					recieve_From_Sub(networkStream);
+					if(targetLine < (targetData.GetLength(1) - 1))
+						{
+							//String tData = 
+							// Send row of Target
+							send_To_Sub(networkStream, );
+							// Wait for response that client got target data. then you know you can send target data again
+							recieve_From_Sub(networkStream);
+						}
+
+					if(beamLine < (beamData.GetLength(1) - 1))
+						{
+							// Send row of Beam    
+							send_To_Sub(networkStream, "foobar");
+							// Wait for response that client got beam data. then you know you can send beam data again
+							recieve_From_Sub(networkStream);
+						}
 				}
 				catch (Exception ex)
 				{

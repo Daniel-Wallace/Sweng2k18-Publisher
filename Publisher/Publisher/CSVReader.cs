@@ -8,14 +8,18 @@
 	returns a 2D string array. 
  
 	Drag onto a gameobject for a demo of CSV parsing.
+
+	Edited By:		Pat Mac Millan
+	Last Edited:	March 30th, 2018
 */
 
-using UnityEngine;
+//using UnityEngine;
 using System.Collections;
 using System.Linq;
-using UnityEngine.UI;
-using UnityEngine.Experimental.UIElements;
+//using UnityEngine.UI;
+//using UnityEngine.Experimental.UIElements;
 using System.IO;
+using System;
 
 public class CSVReader : MonoBehaviour
 {
@@ -48,7 +52,7 @@ public class CSVReader : MonoBehaviour
         }
 
 
-        Debug.Log(textOutput);
+		Console.WriteLine(textOutput);
         return textOutput;
     }
 
@@ -113,15 +117,15 @@ public class CSVReader : MonoBehaviour
         }
         catch (FileNotFoundException e)
         {
-            Debug.Log("Error in file read " + path);
+			Console.WriteLine("Error in file read " + path);
         }
         catch(IOException e)
         {
-            Debug.Log("The file is open in another program");
+			Console.WriteLine("The file is open in another program");
         }
         catch(System.ArgumentException e)
         {
-            Debug.Log("Empty Path Not Allowed");
+            Console.WriteLine("Empty Path Not Allowed");
         }
 
         
