@@ -22,7 +22,7 @@ namespace Publisher
 				counter += 1;
 				clientSocket = serverSocket.AcceptTcpClient();
 				Console.WriteLine(" >> " + "Client No:" + Convert.ToString(counter) + " started!");
-				handleClient client = new handleClinet();
+				handleClient client = new handleClient();
 				client.startClient(clientSocket, Convert.ToString(counter));
 			}
 
