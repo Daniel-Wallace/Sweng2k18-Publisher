@@ -1,3 +1,8 @@
+/*
+ * Program.cs (Server Socket) by
+ * http://csharp.net-informations.com/communications/csharp-multi-threaded-server-socket.htm
+ */
+
 using System;
 using System.Threading;
 using System.Net.Sockets;
@@ -15,6 +20,7 @@ namespace Publisher
 
 			serverSocket.Start();
 			Console.WriteLine(" >> " + "Server Started");
+
 
 			counter = 0;
 			while (true)
@@ -54,6 +60,7 @@ namespace Publisher
 
 			String[,] targetData;
 			int targetLine = 0;		// Current line in targetData
+
 
 			while ((true))
 			{
