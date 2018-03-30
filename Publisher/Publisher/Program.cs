@@ -63,11 +63,11 @@ namespace Publisher
 					
 					
 					// Send row of Target
-					send_to_Sub(networkStream, "Suhhhh???");
+					send_To_Sub(networkStream, "Suhhhh???");
 					// Wait for response that client got target data. then you know you can send target data again
 					recieve_From_Sub(networkStream);
 					// Send row of Beam    
-					send_to_Sub(networkStream, "foobar");
+					send_To_Sub(networkStream, "foobar");
 					// Wait for response that client got beam data. then you know you can send beam data again
 					recieve_From_Sub(networkStream);
 				}
