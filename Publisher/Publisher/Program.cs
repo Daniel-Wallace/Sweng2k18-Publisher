@@ -1,6 +1,9 @@
 /*
  * Program.cs (Server Socket) by
  * http://csharp.net-informations.com/communications/csharp-multi-threaded-server-socket.htm
+ * 
+ * Edited By:		Pat Mac Millan/Daniel Wallace
+ * Last Edited:	    March 31st, 2018
  */
 
 using System;
