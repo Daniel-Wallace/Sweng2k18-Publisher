@@ -84,12 +84,12 @@ namespace Publisher
                 fileCounter++;
             }
 
-            String bFilePath = "";
-			String[,] beamData;		
+            string bFilePath = "";
+			string[,] beamData;		
 			int beamLine = 0;       // Current line in beamData
 
-			String tFilePath = "";
-			String[,] targetData;
+			string tFilePath = "";
+			string[,] targetData;
 			int targetLine = 0;		// Current line in targetData
 
 
@@ -101,7 +101,7 @@ namespace Publisher
 					
 					if(targetLine < (targetData.GetLength(1) - 1))
 						{
-							//String tData = 
+							//string tData = 
 							// Send row of Target
 							send_To_Sub(networkStream, );
 							// Wait for response that client got target data. then you know you can send target data again
@@ -142,7 +142,7 @@ namespace Publisher
 		/// </summary>
 		/// <param name="networkStream"></param> Current subscriber socket stream.
 		/// <param name="csvLine"></param> CSV data to be written to the subscriber.
-		private void send_To_Sub(NetworkStream networkStream, String csvLine)
+		private void send_To_Sub(NetworkStream networkStream, string csvLine)
 		{
 			Byte[] sendBytes = null;
 
