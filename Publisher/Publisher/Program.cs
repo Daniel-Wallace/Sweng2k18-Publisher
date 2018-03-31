@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.IO;
 using System.Threading;
 using System.Net.Sockets;
 using System.Text;
@@ -58,8 +59,32 @@ namespace Publisher
 		private void doChat()
 		{
 			CSVReader reader = new CSVReader();
-			
-			String bFilePath = "";
+
+            //Get name of all CSV files in _Beam Data directory
+            //store all beam csv files in an array
+            DirectoryInfo beamDir = new DirectoryInfo(@"C:\_Beam Data");
+            FileInfo[] Files = beamDir.GetFiles("*.csv"); //Getting CSV files
+            string[] beamFiles = new string[Files.Length];
+            int fileCounter = 0;
+            foreach (FileInfo file in Files)
+            {
+                beamFiles[fileCounter] = file.Name;
+                fileCounter++;
+            }
+
+            //Get name of all CSV files in _Target Data directory
+            //store all target csv files in an array
+            fileCounter = 0;
+            DirectoryInfo targetDir = new DirectoryInfo(@"C:\_Target Data");
+            Files = targetDir.GetFiles("*.csv"); //Getting CSV files
+            string[] targetFiles = new string[Files.Length];
+            foreach (FileInfo file in Files)
+            {
+                targetFiles[fileCounter] = file.Name;
+                fileCounter++;
+            }
+
+            String bFilePath = "";
 			String[,] beamData;		
 			int beamLine = 0;       // Current line in beamData
 
