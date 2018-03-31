@@ -85,12 +85,14 @@ namespace Publisher
             }
 
             string bFilePath = "";
-			string[,] beamData;		
-			int beamLine = 0;       // Current line in beamData
+			string[,] beamData;
+            int beamFileIndex = 0;  //Current index in beam file array
+            int beamLine = 0;       // Current line in current beamData csv file
 
 			string tFilePath = "";
 			string[,] targetData;
-			int targetLine = 0;		// Current line in targetData
+            int targetFileIndex = 0;    //Current index in target file array
+			int targetLine = 0;		// Current line in current targetData csv file
 
 
 			while ((true))
