@@ -23,14 +23,13 @@ using System;
 
 namespace Publisher
 {
-    public class CSVReader
+    class CSVReader
     {
-        public InputField filePath;
         //public Text testing;
 
         public string[,] data;
 
-        public void CSVReader()
+        public CSVReader()
         {
 
 
@@ -68,7 +67,7 @@ namespace Publisher
             for (int i = 0; i < lines.Length; i++)
             {
                 string[] row = SplitCsvLine(lines[i]);
-                width = Mathf.Max(width, row.Length);
+                width = Math.Max(width, row.Length);
             }
 
             // creates new 2D string grid to output to
@@ -99,9 +98,9 @@ namespace Publisher
         }
 
 
-        public void ReadCSV()
+        public void ReadCSV(string filePath)
         {
-            string path = filePath.text;
+            string path = filePath;
             string fileText = "";
 
 
