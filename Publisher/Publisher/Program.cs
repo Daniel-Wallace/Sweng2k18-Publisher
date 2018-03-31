@@ -108,7 +108,7 @@ namespace Publisher
 					if(targetLine < (targetData.GetLength(1) - 1))
 					{
                         tData = ""; //reset string value for every line read
-                        for (int i = 0; i < targetData.GetLength(0); i++)
+                        for (int i = 0; i < targetData.GetLength(0)-1; i++)
                         {
                             //all values in the current row of the current target CSV file separated by a comma.
                             tData = tData + targetData[i, targetLine] + ",";
@@ -129,7 +129,7 @@ namespace Publisher
                         targetData = reader.ReadCSV(tFilePath);
                         targetLine = 0;		// Current line in current targetData csv file
                         tData = ""; //reset string value for every line read
-                        for (int i = 0; i < targetData.GetLength(0); i++)
+                        for (int i = 0; i < targetData.GetLength(0)-1; i++)
                         {
                             //all values in the current row of the current target CSV file separated by a comma.
                             tData = tData + targetData[i, targetLine] + ",";
@@ -145,7 +145,7 @@ namespace Publisher
 					if(beamLine < (beamData.GetLength(1) - 1))
 					{
                         bData = ""; //reset string value for every line read
-                        for (int i = 0; i < beamData.GetLength(0); i++)
+                        for (int i = 0; i < beamData.GetLength(0)-1; i++)
                         {
                             //all values in the current row of the current beam CSV file separated by a comma.
                             bData = bData + beamData[i, beamLine] + ",";
@@ -166,7 +166,7 @@ namespace Publisher
                         beamData = reader.ReadCSV(bFilePath);
                         beamLine = 0;		// Current line in current beamData csv file
                         bData = ""; //reset string value for every line read
-                        for (int i = 0; i < beamData.GetLength(0); i++)
+                        for (int i = 0; i < beamData.GetLength(0)-1; i++)
                         {
                             //all values in the current row of the current beam CSV file separated by a comma.
                             bData = bData + beamData[i, beamLine] + ",";
