@@ -55,6 +55,7 @@ namespace Publisher
 			Thread ctThread = new Thread(doChat);
 			ctThread.Start();
 		}
+
 		// This is going to be done in the thread.
 		private void doChat()
 		{
@@ -64,11 +65,11 @@ namespace Publisher
             //store all beam csv files in an array
             DirectoryInfo beamDir = new DirectoryInfo(@"C:\_Beam Data");
             FileInfo[] Files = beamDir.GetFiles("*.csv"); //Getting CSV files
-            string[] beamFiles = new string[Files.Length];
+            string[] beamFilePaths = new string[Files.Length];
             int fileCounter = 0;
             foreach (FileInfo file in Files)
             {
-                beamFiles[fileCounter] = file.Name;
+                beamFilePaths[fileCounter] = @"C:\_Beam Data\" + file.Name;
                 fileCounter++;
             }
 
@@ -77,20 +78,20 @@ namespace Publisher
             fileCounter = 0;
             DirectoryInfo targetDir = new DirectoryInfo(@"C:\_Target Data");
             Files = targetDir.GetFiles("*.csv"); //Getting CSV files
-            string[] targetFiles = new string[Files.Length];
+            string[] targetFilePaths = new string[Files.Length];
             foreach (FileInfo file in Files)
             {
-                targetFiles[fileCounter] = file.Name;
+                targetFilePaths[fileCounter] = @"C:\_Target Data\" + file.Name;
                 fileCounter++;
             }
 
-            int beamFileIndex = 0;  //Current index in beam file array
-            string bFilePath = beamFiles[beamFileIndex];
+            int beamFileIndex = 0;  //Current index in beam file path array
+            string bFilePath = beamFilePaths[beamFileIndex];
 			string[,] beamData = reader.ReadCSV(bFilePath);
             int beamLine = 0;       // Current line in current beamData csv file
 
-            int targetFileIndex = 0;    //Current index in target file array
-            string tFilePath = targetFiles[targetFileIndex];
+            int targetFileIndex = 0;    //Current index in target file path array
+            string tFilePath = targetFilePaths[targetFileIndex];
 			string[,] targetData = reader.ReadCSV(tFilePath);
 			int targetLine = 0;		// Current line in current targetData csv file
 
