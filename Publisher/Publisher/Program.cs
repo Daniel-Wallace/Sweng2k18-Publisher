@@ -61,51 +61,43 @@ namespace Publisher
 		{
 			CSVReader reader = new CSVReader();
 
-            try
+            //Get name of all CSV files in _Beam Data directory
+            //store all beam csv files in an array
+            DirectoryInfo beamDir = new DirectoryInfo(@"C:\_Beam Data");
+            FileInfo[] Files = beamDir.GetFiles("*.csv"); //Getting CSV files
+            string[] beamFilePaths = new string[Files.Length];
+            int fileCounter = 0;
+            foreach (FileInfo file in Files)
             {
-                //Get name of all CSV files in _Beam Data directory
-                //store all beam csv files in an array
-                DirectoryInfo beamDir = new DirectoryInfo(@"C:\_Beam Data");
-                FileInfo[] Files = beamDir.GetFiles("*.csv"); //Getting CSV files
-                string[] beamFilePaths = new string[Files.Length];
-                int fileCounter = 0;
-                foreach (FileInfo file in Files)
-                {
-                    beamFilePaths[fileCounter] = @"C:\_Beam Data\" + file.Name;
-                    fileCounter++;
-                }
-
-                //Get name of all CSV files in _Target Data directory
-                //store all target csv files in an array
-                fileCounter = 0;
-                DirectoryInfo targetDir = new DirectoryInfo(@"C:\_Target Data");
-                Files = targetDir.GetFiles("*.csv"); //Getting CSV files
-                string[] targetFilePaths = new string[Files.Length];
-                foreach (FileInfo file in Files)
-                {
-                    targetFilePaths[fileCounter] = @"C:\_Target Data\" + file.Name;
-                    fileCounter++;
-                }
-
-                //Read in data from first beam CSV file
-                int beamFileIndex = 0;  //Current index in beam file path array
-                string bFilePath = beamFilePaths[beamFileIndex];
-                string[,] beamData = reader.ReadCSV(bFilePath);
-                int beamLine = 0;       // Current line in current beamData csv file
-                string bData = "";      //Data from current line of beam CSV file
-
-                //Read in data from first target CSV file
-                int targetFileIndex = 0;    //Current index in target file path array
-                string tFilePath = targetFilePaths[targetFileIndex];
-                string[,] targetData = reader.ReadCSV(tFilePath);
-                int targetLine = 0;		// Current line in current targetData csv file
-                string tData = "";      //Data from current line of target CSV file
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(" >> " + ex.ToString());
+                beamFilePaths[fileCounter] = @"C:\_Beam Data\" + file.Name;
+                fileCounter++;
             }
 
+            //Get name of all CSV files in _Target Data directory
+            //store all target csv files in an array
+            fileCounter = 0;
+            DirectoryInfo targetDir = new DirectoryInfo(@"C:\_Target Data");
+            Files = targetDir.GetFiles("*.csv"); //Getting CSV files
+            string[] targetFilePaths = new string[Files.Length];
+            foreach (FileInfo file in Files)
+            {
+                targetFilePaths[fileCounter] = @"C:\_Target Data\" + file.Name;
+                fileCounter++;
+            }
+
+            //Read in data from first beam CSV file
+            int beamFileIndex = 0;  //Current index in beam file path array
+            string bFilePath = beamFilePaths[beamFileIndex];
+			string[,] beamData = reader.ReadCSV(bFilePath);
+            int beamLine = 0;       // Current line in current beamData csv file
+            string bData = "";      //Data from current line of beam CSV file
+
+            //Read in data from first target CSV file
+            int targetFileIndex = 0;    //Current index in target file path array
+            string tFilePath = targetFilePaths[targetFileIndex];
+			string[,] targetData = reader.ReadCSV(tFilePath);  
+			int targetLine = 0;		// Current line in current targetData csv file
+            string tData = "";      //Data from current line of target CSV file
 
             while ((true))
 			{
