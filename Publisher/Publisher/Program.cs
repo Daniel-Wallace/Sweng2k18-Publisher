@@ -121,7 +121,7 @@ namespace Publisher
                         targetLine++;
 					}
                     //reached end of current target CSV file
-                    else if(targetFileIndex < targetFilePaths.Length)   //makes sure there are still target CSV files left to be read
+                    else if(targetFileIndex < targetFilePaths.Length-1)   //makes sure there are still target CSV files left to be read
                     {
                         //read in data from next target CSV file
                         targetFileIndex++;    //Current index in target file path array
@@ -158,7 +158,7 @@ namespace Publisher
                         beamLine++;
                     }
                     //reached end of current beam CSV file
-                    else if (beamFileIndex < beamFilePaths.Length)   //makes sure there are still beam CSV files left to be read
+                    else if (beamFileIndex < beamFilePaths.Length-1)   //makes sure there are still beam CSV files left to be read
                     {
                         //read in data from next beam CSV file
                         beamFileIndex++;    //Current index in beam file path array
