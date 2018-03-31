@@ -61,64 +61,132 @@ namespace Publisher
 		{
 			CSVReader reader = new CSVReader();
 
-            //Get name of all CSV files in _Beam Data directory
-            //store all beam csv files in an array
-            DirectoryInfo beamDir = new DirectoryInfo(@"C:\_Beam Data");
-            FileInfo[] Files = beamDir.GetFiles("*.csv"); //Getting CSV files
-            string[] beamFilePaths = new string[Files.Length];
-            int fileCounter = 0;
-            foreach (FileInfo file in Files)
+            try
             {
-                beamFilePaths[fileCounter] = @"C:\_Beam Data\" + file.Name;
-                fileCounter++;
+                //Get name of all CSV files in _Beam Data directory
+                //store all beam csv files in an array
+                DirectoryInfo beamDir = new DirectoryInfo(@"C:\_Beam Data");
+                FileInfo[] Files = beamDir.GetFiles("*.csv"); //Getting CSV files
+                string[] beamFilePaths = new string[Files.Length];
+                int fileCounter = 0;
+                foreach (FileInfo file in Files)
+                {
+                    beamFilePaths[fileCounter] = @"C:\_Beam Data\" + file.Name;
+                    fileCounter++;
+                }
+
+                //Get name of all CSV files in _Target Data directory
+                //store all target csv files in an array
+                fileCounter = 0;
+                DirectoryInfo targetDir = new DirectoryInfo(@"C:\_Target Data");
+                Files = targetDir.GetFiles("*.csv"); //Getting CSV files
+                string[] targetFilePaths = new string[Files.Length];
+                foreach (FileInfo file in Files)
+                {
+                    targetFilePaths[fileCounter] = @"C:\_Target Data\" + file.Name;
+                    fileCounter++;
+                }
+
+                //Read in data from first beam CSV file
+                int beamFileIndex = 0;  //Current index in beam file path array
+                string bFilePath = beamFilePaths[beamFileIndex];
+                string[,] beamData = reader.ReadCSV(bFilePath);
+                int beamLine = 0;       // Current line in current beamData csv file
+                string bData = "";      //Data from current line of beam CSV file
+
+                //Read in data from first target CSV file
+                int targetFileIndex = 0;    //Current index in target file path array
+                string tFilePath = targetFilePaths[targetFileIndex];
+                string[,] targetData = reader.ReadCSV(tFilePath);
+                int targetLine = 0;		// Current line in current targetData csv file
+                string tData = "";      //Data from current line of target CSV file
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(" >> " + ex.ToString());
             }
 
-            //Get name of all CSV files in _Target Data directory
-            //store all target csv files in an array
-            fileCounter = 0;
-            DirectoryInfo targetDir = new DirectoryInfo(@"C:\_Target Data");
-            Files = targetDir.GetFiles("*.csv"); //Getting CSV files
-            string[] targetFilePaths = new string[Files.Length];
-            foreach (FileInfo file in Files)
-            {
-                targetFilePaths[fileCounter] = @"C:\_Target Data\" + file.Name;
-                fileCounter++;
-            }
 
-            int beamFileIndex = 0;  //Current index in beam file path array
-            string bFilePath = beamFilePaths[beamFileIndex];
-			string[,] beamData = reader.ReadCSV(bFilePath);
-            int beamLine = 0;       // Current line in current beamData csv file
-
-            int targetFileIndex = 0;    //Current index in target file path array
-            string tFilePath = targetFilePaths[targetFileIndex];
-			string[,] targetData = reader.ReadCSV(tFilePath);
-			int targetLine = 0;		// Current line in current targetData csv file
-
-
-			while ((true))
+            while ((true))
 			{
 				try
 				{
 					NetworkStream networkStream = clientSocket.GetStream();
 					
 					if(targetLine < (targetData.GetLength(1) - 1))
-						{
-							//string tData = 
-							// Send row of Target
-							send_To_Sub(networkStream, );
-							// Wait for response that client got target data. then you know you can send target data again
-							recieve_From_Sub(networkStream);
-						}
+					{
+                        tData = ""; //reset string value for every line read
+                        for (int i = 0; i < targetData.GetLength(0); i++)
+                        {
+                            //all values in the current row of the current target CSV file separated by a comma.
+                            tData = tData + targetData[i, targetLine] + ",";
+                        }
+						// Send row of Target
+						send_To_Sub(networkStream, tData);
+						// Wait for response that client got target data. then you know you can send target data again
+				        recieve_From_Sub(networkStream);
+                        //increment targetLine so that the next line is sent on the next iteration of the loop
+                        targetLine++;
+					}
+                    //reached end of current target CSV file
+                    else if(targetFileIndex < targetFilePaths.Length)   //makes sure there are still target CSV files left to be read
+                    {
+                        //read in data from next target CSV file
+                        targetFileIndex++;    //Current index in target file path array
+                        tFilePath = targetFilePaths[targetFileIndex];
+                        targetData = reader.ReadCSV(tFilePath);
+                        targetLine = 0;		// Current line in current targetData csv file
+                        tData = ""; //reset string value for every line read
+                        for (int i = 0; i < targetData.GetLength(0); i++)
+                        {
+                            //all values in the current row of the current target CSV file separated by a comma.
+                            tData = tData + targetData[i, targetLine] + ",";
+                        }
+                        // Send row of Target
+                        send_To_Sub(networkStream, tData);
+                        // Wait for response that client got target data. then you know you can send target data again
+                        recieve_From_Sub(networkStream);
+                        //increment targetLine so that the next line is sent on the next iteration of the loop
+                        targetLine++;
+                    }
 
 					if(beamLine < (beamData.GetLength(1) - 1))
-						{
-							// Send row of Beam    
-							send_To_Sub(networkStream, "foobar");
-							// Wait for response that client got beam data. then you know you can send beam data again
-							recieve_From_Sub(networkStream);
-						}
-				}
+					{
+                        bData = ""; //reset string value for every line read
+                        for (int i = 0; i < beamData.GetLength(0); i++)
+                        {
+                            //all values in the current row of the current beam CSV file separated by a comma.
+                            bData = bData + beamData[i, beamLine] + ",";
+                        }
+                        // Send row of Beam    
+                        send_To_Sub(networkStream, bData);
+						// Wait for response that client got beam data. then you know you can send beam data again
+						recieve_From_Sub(networkStream);
+                        //increment beamLine so that the next line is sent on the next iteration of the loop
+                        beamLine++;
+                    }
+                    //reached end of current beam CSV file
+                    else if (beamFileIndex < beamFilePaths.Length)   //makes sure there are still beam CSV files left to be read
+                    {
+                        //read in data from next beam CSV file
+                        beamFileIndex++;    //Current index in beam file path array
+                        bFilePath = beamFilePaths[beamFileIndex];
+                        beamData = reader.ReadCSV(bFilePath);
+                        beamLine = 0;		// Current line in current beamData csv file
+                        bData = ""; //reset string value for every line read
+                        for (int i = 0; i < beamData.GetLength(0); i++)
+                        {
+                            //all values in the current row of the current beam CSV file separated by a comma.
+                            bData = bData + beamData[i, beamLine] + ",";
+                        }
+                        // Send row of Target
+                        send_To_Sub(networkStream, bData);
+                        // Wait for response that client got beam data. then you know you can send beam data again
+                        recieve_From_Sub(networkStream);
+                        //increment beamLine so that the next line is sent on the next iteration of the loop
+                        beamLine++;
+                    }
+                }
 				catch (Exception ex)
 				{
 					Console.WriteLine(" >> " + ex.ToString());
