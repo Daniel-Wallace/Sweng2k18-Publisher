@@ -84,14 +84,14 @@ namespace Publisher
                 fileCounter++;
             }
 
-            string bFilePath = "";
-			string[,] beamData;
             int beamFileIndex = 0;  //Current index in beam file array
+            string bFilePath = beamFiles[beamFileIndex];
+			string[,] beamData = reader.ReadCSV(bFilePath);
             int beamLine = 0;       // Current line in current beamData csv file
 
-			string tFilePath = "";
-			string[,] targetData;
             int targetFileIndex = 0;    //Current index in target file array
+            string tFilePath = targetFiles[targetFileIndex];
+			string[,] targetData = reader.ReadCSV(tFilePath);
 			int targetLine = 0;		// Current line in current targetData csv file
 
 

@@ -97,8 +97,13 @@ namespace Publisher
                     select m.Groups[1].Value).ToArray();
         }
 
-
-        public void ReadCSV(string filePath)
+        /// <summary>
+        /// ReadCSV reads through a CSV file and returns its contents in a 2-dimensional array
+        /// note that 2-dimensional array is [column, row]
+        /// </summary>
+        /// <param name="filePath"></param> The name of the CSV file to be read from
+        /// <returns>data</returns> A 2-dimensional array containing the contents of the CSV file in column-row form
+        public string[,] ReadCSV(string filePath)
         {
             string path = filePath;
             string fileText = "";
@@ -129,7 +134,7 @@ namespace Publisher
                 Console.WriteLine("Empty Path Not Allowed");
             }
 
-
+            return data;
         }
     }
 }
