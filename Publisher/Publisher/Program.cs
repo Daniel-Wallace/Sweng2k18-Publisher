@@ -89,14 +89,14 @@ namespace Publisher
             int beamFileIndex = 0;  //Current index in beam file path array
             string bFilePath = beamFilePaths[beamFileIndex];
 			string[,] beamData = reader.ReadCSV(bFilePath);
-            int beamLine = 0;       // Current line in current beamData csv file
+            int beamLine = 1;       // Current line in current beamData csv file
             string bData = "";      //Data from current line of beam CSV file
 
             //Read in data from first target CSV file
             int targetFileIndex = 0;    //Current index in target file path array
             string tFilePath = targetFilePaths[targetFileIndex];
 			string[,] targetData = reader.ReadCSV(tFilePath);  
-			int targetLine = 0;		// Current line in current targetData csv file
+			int targetLine = 1;		// Current line in current targetData csv file
             string tData = "";      //Data from current line of target CSV file
 
             while ((true))
@@ -127,7 +127,7 @@ namespace Publisher
                         targetFileIndex++;    //Current index in target file path array
                         tFilePath = targetFilePaths[targetFileIndex];
                         targetData = reader.ReadCSV(tFilePath);
-                        targetLine = 0;		// Current line in current targetData csv file
+                        targetLine = 1;		// Current line in current targetData csv file
                         tData = ""; //reset string value for every line read
                         for (int i = 0; i < targetData.GetLength(0)-1; i++)
                         {
@@ -164,7 +164,7 @@ namespace Publisher
                         beamFileIndex++;    //Current index in beam file path array
                         bFilePath = beamFilePaths[beamFileIndex];
                         beamData = reader.ReadCSV(bFilePath);
-                        beamLine = 0;		// Current line in current beamData csv file
+                        beamLine = 1;		// Current line in current beamData csv file
                         bData = ""; //reset string value for every line read
                         for (int i = 0; i < beamData.GetLength(0)-1; i++)
                         {
