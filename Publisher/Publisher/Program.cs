@@ -189,10 +189,14 @@ namespace Publisher
         /// <returns>filePaths</returns> array with all names of csv files in the specified directory
         private string[] getAllFilesInDirectory(string directory)
         {
-			try{
+            //default string array for when no files are found
+            string[] filePaths = new string[1];
+            filePaths[0] = "No files";
+            try
+            {
 				DirectoryInfo dir = new DirectoryInfo(directory);   //specify a directory to read from
 				FileInfo[] Files = dir.GetFiles("*.csv"); //Getting CSV files in the directory specified
-				string[] filePaths = new string[Files.Length];
+				filePaths = new string[Files.Length];
 				int fileCounter = 0;
 				foreach (FileInfo file in Files)
 				{
@@ -201,9 +205,12 @@ namespace Publisher
 					fileCounter++;
 				}
 				return filePaths;
-				}
+			}
 			catch(Exception e)
-			{ Console.WriteLine(e.ToString()); }	
+			{
+                Console.WriteLine(e.ToString());
+                return filePaths;
+            }	
             
         }
 
