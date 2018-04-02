@@ -98,7 +98,7 @@ namespace Publisher
             targetFileIndex = 0;    //Current index in target file path array
             readingTargetFile(targetFileIndex);
 
-            while ((true))
+            while (beamFileIndex < beamFilePaths.Length - 1 && targetFileIndex < targetFilePaths.Length-1)
 			{
 				try
 				{
@@ -116,6 +116,11 @@ namespace Publisher
                         readingBeamFile(beamFileIndex);
                         sendAndReceiveBeam(networkStream);
                     }
+					else
+					{
+						send_To_Sub(networkStream, "End of file.");
+						recieve_From_Sub(networkStream);
+					}
 
                     if (targetLine < (targetData.GetLength(1) - 1))
 					{
@@ -129,16 +134,27 @@ namespace Publisher
                         readingTargetFile(targetFileIndex);
                         sendAndReceiveTarget(networkStream);
                     }
+					else
+					{
+						send_To_Sub(networkStream, "End of file.");
+						recieve_From_Sub(networkStream);
+					}
                 }
 				catch (Exception ex)
 				{
-					Console.WriteLine(" >> " + ex.ToString());
+					Console.WriteLine("Error with Client Socket #" + clNo + ".");
+					Console.WriteLine("Closing Client Socket #" + clNo + "...");
+					Console.WriteLine("Socket closed.");
+
+					//break;
 				}
 			}
+			// End of while loop
+
 		}
 
 		/// <summary>
-		/// 
+		/// Method for handling information sent to the publisher from the subscriber.
 		/// </summary>
 		/// <param name="networkStream"></param> Current subscriber socket stream.
 		private void recieve_From_Sub(NetworkStream networkStream)
@@ -148,11 +164,11 @@ namespace Publisher
 
 			networkStream.Read(bytesFrom, 0, (int)bytesFrom.Length);
 			dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
-			dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
+			dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("."));
 		}
 
 		/// <summary>
-		/// 
+		/// Method for sending information to the subscriber from the publisher.
 		/// </summary>
 		/// <param name="networkStream"></param> Current subscriber socket stream.
 		/// <param name="csvLine"></param> CSV data to be written to the subscriber.
@@ -173,17 +189,22 @@ namespace Publisher
         /// <returns>filePaths</returns> array with all names of csv files in the specified directory
         private string[] getAllFilesInDirectory(string directory)
         {
-            DirectoryInfo dir = new DirectoryInfo(directory);   //specify a directory to read from
-            FileInfo[] Files = dir.GetFiles("*.csv"); //Getting CSV files in the directory specified
-            string[] filePaths = new string[Files.Length];
-            int fileCounter = 0;
-            foreach (FileInfo file in Files)
-            {
-                //store all file paths of files in specified directory as CSVReader needs a complete file path
-                filePaths[fileCounter] = directory + @"\" + file.Name;
-                fileCounter++;
-            }
-            return filePaths;
+			try{
+				DirectoryInfo dir = new DirectoryInfo(directory);   //specify a directory to read from
+				FileInfo[] Files = dir.GetFiles("*.csv"); //Getting CSV files in the directory specified
+				string[] filePaths = new string[Files.Length];
+				int fileCounter = 0;
+				foreach (FileInfo file in Files)
+				{
+					//store all file paths of files in specified directory as CSVReader needs a complete file path
+					filePaths[fileCounter] = directory + @"\" + file.Name;
+					fileCounter++;
+				}
+				return filePaths;
+				}
+			catch(Exception e)
+			{ Console.WriteLine(e.ToString()); }	
+            
         }
 
         /// <summary>
@@ -228,6 +249,8 @@ namespace Publisher
                 //all values in the current row of the current beam CSV file separated by a comma.
                 bData = bData + beamData[i, beamLine] + ",";
             }
+			bData = bData.Remove(bData.Length - 1);
+
             // Send row of Beam data over the stream to the client (subscriber)   
             send_To_Sub(nStream, bData);
             // Wait for response that client got beam data. then you know you can send beam data again
@@ -252,6 +275,8 @@ namespace Publisher
                 //all values in the current row of the current target CSV file separated by a comma.
                 tData = tData + targetData[i, targetLine] + ",";
             }
+			tData = tData.Remove(tData.Length - 1);
+
             // Send row of Target data over the stream to the client (subscriber)
             send_To_Sub(nStream, tData);
             // Wait for response that client got target data. then you know you can send target data again
