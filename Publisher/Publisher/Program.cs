@@ -134,7 +134,6 @@ namespace Publisher
 				{
 					Console.WriteLine("Error with Client Socket #" + clNo + ".");
 					Console.WriteLine("Closing Client Socket #" + clNo + "...");
-					networkStream.close();
 					Console.WriteLine("Socket closed.");
 				}
 			}
