@@ -132,13 +132,18 @@ namespace Publisher
                 }
 				catch (Exception ex)
 				{
-					Console.WriteLine(" >> " + ex.ToString());
+					Console.WriteLine("Error with Client Socket #" + clNo + ".");
+					Console.WriteLine("Closing Client Socket #" + clNo + "...");
+					networkStream.close();
+					Console.WriteLine("Socket closed.");
 				}
 			}
+			// End of while loop
+
 		}
 
 		/// <summary>
-		/// 
+		/// Method for handling information sent to the publisher from the subscriber.
 		/// </summary>
 		/// <param name="networkStream"></param> Current subscriber socket stream.
 		private void recieve_From_Sub(NetworkStream networkStream)
@@ -152,7 +157,7 @@ namespace Publisher
 		}
 
 		/// <summary>
-		/// 
+		/// Method for sending information to the subscriber from the publisher.
 		/// </summary>
 		/// <param name="networkStream"></param> Current subscriber socket stream.
 		/// <param name="csvLine"></param> CSV data to be written to the subscriber.
@@ -228,6 +233,8 @@ namespace Publisher
                 //all values in the current row of the current beam CSV file separated by a comma.
                 bData = bData + beamData[i, beamLine] + ",";
             }
+			bData = bData.Remove(bData.Length - 1);
+
             // Send row of Beam data over the stream to the client (subscriber)   
             send_To_Sub(nStream, bData);
             // Wait for response that client got beam data. then you know you can send beam data again
@@ -252,6 +259,8 @@ namespace Publisher
                 //all values in the current row of the current target CSV file separated by a comma.
                 tData = tData + targetData[i, targetLine] + ",";
             }
+			tData = tData.Remove(tData.Length - 1);
+
             // Send row of Target data over the stream to the client (subscriber)
             send_To_Sub(nStream, tData);
             // Wait for response that client got target data. then you know you can send target data again
