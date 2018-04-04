@@ -28,13 +28,15 @@ namespace Publisher
 
 
 			counter = 0;
+			string ipAddress;
 			while (true)
 			{
 				counter += 1;
 				clientSocket = serverSocket.AcceptTcpClient();
-				Console.WriteLine(" >> " + "Client No:" + Convert.ToString(counter) + " started!");
+				ipAddress = ((IPEndPoint)clientSocket.Client.RemoteEndPoint).Address.ToString(); // Recieves IP adress from client socket
+				Console.WriteLine(" >> " + "Client at " + ipAddress + " started...");
 				handleClient client = new handleClient();
-				client.startClient(clientSocket, Convert.ToString(counter));
+				client.startClient(clientSocket, ipAddress);
 			}
 
 			clientSocket.Close();
@@ -48,6 +50,7 @@ namespace Publisher
 	public class handleClient
 	{
 		TcpClient clientSocket;
+		string clientIP;
 		string clNo;
 
         //CSVReader object to be used to read all beam and target CSV files
@@ -77,10 +80,10 @@ namespace Publisher
         string bData;
         string tData;
 
-        public void startClient(TcpClient inClientSocket, string clineNo)
+        public void startClient(TcpClient inClientSocket, string clientIP)
 		{
 			this.clientSocket = inClientSocket;
-			this.clNo = clineNo;
+			this.clientIP = clientIP;
 			Thread ctThread = new Thread(doChat);
 			ctThread.Start();
 		}
@@ -148,9 +151,9 @@ namespace Publisher
                 }
 				catch (Exception ex)
 				{
-					Console.WriteLine("Error with Client Socket #" + clNo + ".");
+					Console.WriteLine("Error with Client " + clientIP);
 					Console.WriteLine("Error: " + ex.ToString());
-					Console.WriteLine("Closing Client Socket #" + clNo + "...");
+					Console.WriteLine("Closing Client " + clientIP + "...");
 					Console.WriteLine("Socket closed.");
 					break;
 				}
@@ -158,8 +161,8 @@ namespace Publisher
 			// End of while loop
 
 			// Close connections
-			Console.WriteLine("All data sent to Client #" + clNo + " successfully.");
-			Console.WriteLine("Client #" + clNo + " has been closed.");
+			Console.WriteLine(">> All data has been sent to Client " + clientIP + " successfully.");
+			Console.WriteLine(">> Client " + clientIP + " connection has been closed...");
 
 		}
 
@@ -177,7 +180,7 @@ namespace Publisher
 				dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
 				dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("."));
 			}
-			Console.WriteLine("Data received from client: " + dataFromClient);
+			Console.WriteLine("Data received from " + clientIP + ": " + dataFromClient);
 
 			Thread.Sleep(500);
 		}
@@ -195,7 +198,7 @@ namespace Publisher
 			networkStream.Write(sendBytes, 0, sendBytes.Length);
 			networkStream.Flush();
 			Console.WriteLine("---------------------------------------------------------------------");
-			Console.WriteLine("Data sent to client: " + csvLine);
+			Console.WriteLine("Data sent to " + clientIP + ": " + csvLine);
 			Console.WriteLine("---------------------------------------------------------------------");
 
 			Thread.Sleep(500);
