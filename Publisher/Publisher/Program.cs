@@ -9,6 +9,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -27,13 +28,15 @@ namespace Publisher
 
 
 			counter = 0;
+			string ipAddress;
 			while (true)
 			{
 				counter += 1;
 				clientSocket = serverSocket.AcceptTcpClient();
-				Console.WriteLine(" >> " + "Client No:" + Convert.ToString(counter) + " started!");
+				ipAddress = ((IPEndPoint)clientSocket.Client.RemoteEndPoint).Address.ToString(); // Recieves IP adress from client socket
+				Console.WriteLine(" >> " + "Client at " + ipAddress + " started...");
 				handleClient client = new handleClient();
-				client.startClient(clientSocket, Convert.ToString(counter));
+				client.startClient(clientSocket, ipAddress);
 			}
 
 			clientSocket.Close();
@@ -47,6 +50,7 @@ namespace Publisher
 	public class handleClient
 	{
 		TcpClient clientSocket;
+		string clientIP;
 		string clNo;
 
         //CSVReader object to be used to read all beam and target CSV files
@@ -76,10 +80,10 @@ namespace Publisher
         string bData;
         string tData;
 
-        public void startClient(TcpClient inClientSocket, string clineNo)
+        public void startClient(TcpClient inClientSocket, string clientIP)
 		{
 			this.clientSocket = inClientSocket;
-			this.clNo = clineNo;
+			this.clientIP = clientIP;
 			Thread ctThread = new Thread(doChat);
 			ctThread.Start();
 		}
@@ -98,7 +102,10 @@ namespace Publisher
             targetFileIndex = 0;    //Current index in target file path array
             readingTargetFile(targetFileIndex);
 
-            while ((true))
+			bool targetEndOfFile = false;
+			bool beamEndOfFile = false; 
+
+            while (!targetEndOfFile && !beamEndOfFile)
 			{
 				try
 				{
@@ -116,6 +123,12 @@ namespace Publisher
                         readingBeamFile(beamFileIndex);
                         sendAndReceiveBeam(networkStream);
                     }
+					// End of all files
+					else
+					{
+						send_To_Sub(networkStream, "End of file.");
+						beamEndOfFile = true;
+					}
 
                     if (targetLine < (targetData.GetLength(1) - 1))
 					{
@@ -129,16 +142,27 @@ namespace Publisher
                         readingTargetFile(targetFileIndex);
                         sendAndReceiveTarget(networkStream);
                     }
+					// End of all files
+					else
+					{
+						send_To_Sub(networkStream, "End of file.");
+						targetEndOfFile = true;
+					}
                 }
 				catch (Exception ex)
 				{
-					Console.WriteLine("Error with Client Socket #" + clNo + ".");
-					Console.WriteLine("Closing Client Socket #" + clNo + "...");
+					Console.WriteLine("Error with Client " + clientIP);
+					Console.WriteLine("Error: " + ex.ToString());
+					Console.WriteLine("Closing Client " + clientIP + "...");
 					Console.WriteLine("Socket closed.");
+					break;
 				}
 			}
 			// End of while loop
 
+			// Close connections
+			Console.WriteLine(">> All data has been sent to Client " + clientIP + " successfully.");
+			Console.WriteLine(">> Client " + clientIP + " connection has been closed...");
 		}
 
 		/// <summary>
@@ -149,10 +173,15 @@ namespace Publisher
 		{
 			byte[] bytesFrom = new byte[10025];
 			string dataFromClient = null;
+			while(dataFromClient.Equals("Message Received.") == false)
+			{
+				networkStream.Read(bytesFrom, 0, (int)bytesFrom.Length);
+				dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
+				dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("."));
+			}
+			Console.WriteLine("Data received from " + clientIP + ": " + dataFromClient);
 
-			networkStream.Read(bytesFrom, 0, (int)bytesFrom.Length);
-			dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
-			dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
+			Thread.Sleep(500);
 		}
 
 		/// <summary>
@@ -167,6 +196,11 @@ namespace Publisher
 			sendBytes = Encoding.ASCII.GetBytes(csvLine);
 			networkStream.Write(sendBytes, 0, sendBytes.Length);
 			networkStream.Flush();
+			Console.WriteLine("---------------------------------------------------------------------");
+			Console.WriteLine("Data sent to " + clientIP + ": " + csvLine);
+			Console.WriteLine("---------------------------------------------------------------------");
+
+			Thread.Sleep(500);
 		}
 
         /// <summary>
@@ -237,7 +271,7 @@ namespace Publisher
             // Send row of Beam data over the stream to the client (subscriber)   
             send_To_Sub(nStream, bData);
             // Wait for response that client got beam data. then you know you can send beam data again
-            recieve_From_Sub(nStream);
+            //recieve_From_Sub(nStream);
             //increment beamLine so that the next line is sent on the next iteration of the loop
             beamLine++;
             //reset string value for every line read
@@ -263,7 +297,7 @@ namespace Publisher
             // Send row of Target data over the stream to the client (subscriber)
             send_To_Sub(nStream, tData);
             // Wait for response that client got target data. then you know you can send target data again
-            recieve_From_Sub(nStream);
+            //recieve_From_Sub(nStream);
             //increment targetLine so that the next line is sent on the next iteration of the loop
             targetLine++;
             //reset string value for every line read
