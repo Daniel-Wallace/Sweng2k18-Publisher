@@ -163,7 +163,6 @@ namespace Publisher
 			// Close connections
 			Console.WriteLine(">> All data has been sent to Client " + clientIP + " successfully.");
 			Console.WriteLine(">> Client " + clientIP + " connection has been closed...");
-
 		}
 
 		/// <summary>
