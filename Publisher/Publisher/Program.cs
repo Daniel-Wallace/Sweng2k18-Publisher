@@ -12,6 +12,7 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace Publisher
 {
@@ -19,7 +20,9 @@ namespace Publisher
 	{
 		static void Main(string[] args)
 		{
-			TcpListener serverSocket = new TcpListener(8888);
+			int port = 8888; // Port publisher is listening on.
+
+			TcpListener serverSocket = new TcpListener(port);
 			TcpClient clientSocket = default(TcpClient);
 			int counter = 0;
 
@@ -169,19 +172,16 @@ namespace Publisher
 		/// Method for handling information sent to the publisher from the subscriber.
 		/// </summary>
 		/// <param name="networkStream"></param> Current subscriber socket stream.
-		private void recieve_From_Sub(NetworkStream networkStream)
+		private string recieve_From_Sub(NetworkStream networkStream)
 		{
 			byte[] bytesFrom = new byte[10025];
 			string dataFromClient = null;
-			while(dataFromClient.Equals("Message Received.") == false)
-			{
-				networkStream.Read(bytesFrom, 0, (int)bytesFrom.Length);
-				dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
-				dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("."));
-			}
-			Console.WriteLine("Data received from " + clientIP + ": " + dataFromClient);
 
-			Thread.Sleep(500);
+			networkStream.Read(bytesFrom, 0, (int)bytesFrom.Length);
+			dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
+			dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("."));
+			
+			return dataFromClient;
 		}
 
 		/// <summary>
@@ -260,7 +260,7 @@ namespace Publisher
         /// </summary>
         /// <param name="nStream"></param>
         private void sendAndReceiveBeam(NetworkStream nStream)
-        {
+        { 
             for (int i = 0; i < beamData.GetLength(0) - 1; i++)
             {
                 //all values in the current row of the current beam CSV file separated by a comma.
@@ -270,8 +270,10 @@ namespace Publisher
 
             // Send row of Beam data over the stream to the client (subscriber)   
             send_To_Sub(nStream, bData);
-            // Wait for response that client got beam data. then you know you can send beam data again
-            //recieve_From_Sub(nStream);
+            
+            // Verify data with SHA-1 algo.
+			handleHash(nStream, bData);
+
             //increment beamLine so that the next line is sent on the next iteration of the loop
             beamLine++;
             //reset string value for every line read
@@ -287,6 +289,7 @@ namespace Publisher
         /// <param name="nStream"></param>
         private void sendAndReceiveTarget(NetworkStream nStream)
         {
+			
             for (int i = 0; i < targetData.GetLength(0) - 1; i++)
             {
                 //all values in the current row of the current target CSV file separated by a comma.
@@ -296,12 +299,72 @@ namespace Publisher
 
             // Send row of Target data over the stream to the client (subscriber)
             send_To_Sub(nStream, tData);
-            // Wait for response that client got target data. then you know you can send target data again
-            //recieve_From_Sub(nStream);
+            
+            // Verify data with SHA-1 algo.
+			handleHash(nStream, tData);
+			
             //increment targetLine so that the next line is sent on the next iteration of the loop
             targetLine++;
             //reset string value for every line read
             tData = "";
         }
+
+		/// <summary>
+		/// Method for creating SHA-1 Hashes
+		/// </summary>
+		/// <param name="csvLine"></param> CSV line we wish to hash.
+		private string hashSHA1(string csvLine)
+		{
+			SHA1CryptoServiceProvider hashMaker = new SHA1CryptoServiceProvider();
+			hashMaker.ComputeHash(ASCIIEncoding.ASCII.GetBytes(csvLine)); // Creates a hash of our csvLine data
+			byte[] hashBytes = hashMaker.Hash; // move hashed byte values into byte array
+			StringBuilder sb = new StringBuilder();
+
+			foreach(byte b in hashBytes)
+			{
+				sb.Append(b.ToString("X2")); // "X2" converts bytes to a hex format
+			}
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+        /// Handles SHA-1 verification by hashing a csv line and receiving a hash value of the same
+		/// csv line from the subscriber. It then tells the subscriber if that value is correct or not
+		/// by sending it a true or false string based on the comparison of the two strings.
+        /// </summary>
+        /// <param name="nStream"></param> Network socket
+		/// <param name="csvLine"></param> Line of csv we wish to verify
+		private void handleHash(NetworkStream nStream, string csvLine)
+		{
+			string dataHash = hashSHA1(csvLine);
+			string subHashValue = recieve_From_Sub(nStream);
+
+			if(subHashValue.Equals(dataHash))
+			{
+
+				Console.WriteLine("CSVLine sent successfully to " + clientIP + ":");
+				Console.WriteLine("Hash sent: \t\t" + dataHash);
+				Console.WriteLine("Hash received: \t\t" + subHashValue);
+
+				send_To_Sub(nStream, "true");
+			}
+			else
+			{
+				Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				Console.WriteLine("WARNING: CSVLine does not match sent value.");
+				Console.WriteLine("If problem persists, asses network for any ");
+				Console.WriteLine("malfunctioning or unauthorized connections.");
+				Console.WriteLine("Subscriber IP:" + clientIP);
+				Console.WriteLine("Hash sent: \t\t" + dataHash);
+				Console.WriteLine("Hash received: \t\t" + subHashValue);
+				Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+				Console.WriteLine("Hash sent: \t\t" + dataHash);
+				Console.WriteLine("Hash received: \t\t" + subHashValue);
+
+				send_To_Sub(nStream, "false");
+			}
+		}
 	}
 }
