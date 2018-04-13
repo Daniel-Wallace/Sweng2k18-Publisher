@@ -176,10 +176,12 @@ namespace Publisher
 		{
 			byte[] bytesFrom = new byte[10025];
 			string dataFromClient = null;
+			
+			Thread.Sleep(1000);
 
 			networkStream.Read(bytesFrom, 0, (int)bytesFrom.Length);
 			dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
-			dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("."));
+			//dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("."));
 			
 			return dataFromClient;
 		}
@@ -200,7 +202,6 @@ namespace Publisher
 			Console.WriteLine("Data sent to " + clientIP + ": " + csvLine);
 			Console.WriteLine("---------------------------------------------------------------------");
 
-			Thread.Sleep(500);
 		}
 
         /// <summary>
@@ -268,11 +269,16 @@ namespace Publisher
             }
 			bData = bData.Remove(bData.Length - 1);
 
+			Thread.Sleep(500);
             // Send row of Beam data over the stream to the client (subscriber)   
             send_To_Sub(nStream, bData);
             
+			Thread.Sleep(500);
+			//Send Hash
+			send_To_Sub(nStream, hashSHA1(tData));
+
             // Verify data with SHA-1 algo.
-			handleHash(nStream, bData);
+			//handleHash(nStream, bData);
 
             //increment beamLine so that the next line is sent on the next iteration of the loop
             beamLine++;
@@ -297,11 +303,16 @@ namespace Publisher
             }
 			tData = tData.Remove(tData.Length - 1);
 
+			Thread.Sleep(500);
             // Send row of Target data over the stream to the client (subscriber)
             send_To_Sub(nStream, tData);
             
+			Thread.Sleep(500);
+			// Send Hash
+			send_To_Sub(nStream, hashSHA1(tData));
+
             // Verify data with SHA-1 algo.
-			handleHash(nStream, tData);
+			//handleHash(nStream, tData);
 			
             //increment targetLine so that the next line is sent on the next iteration of the loop
             targetLine++;
