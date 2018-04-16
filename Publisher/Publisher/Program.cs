@@ -177,7 +177,7 @@ namespace Publisher
 			byte[] bytesFrom = new byte[10025];
 			string dataFromClient = null;
 			
-			Thread.Sleep(1000);
+			Thread.Sleep(2000);
 
 			networkStream.Read(bytesFrom, 0, (int)bytesFrom.Length);
 			dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
@@ -275,7 +275,7 @@ namespace Publisher
             
 			Thread.Sleep(500);
 			//Send Hash
-			send_To_Sub(nStream, hashSHA1(tData));
+			send_To_Sub(nStream, hashSHA1(bData));
 
             // Verify data with SHA-1 algo.
 			//handleHash(nStream, bData);
